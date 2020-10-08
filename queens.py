@@ -2,10 +2,6 @@ import numpy as np
 from util.plotter import Plotter
 from util.algos import randomized_hill_climb, simulated_annealing, genetic_algorithm, mimic
 from util.problems import queens_problem
-import six
-import sys
-sys.modules['sklearn.externals.six'] = six
-import mlrose
 
 def plot_rhc(fitness_fn, name, label):
     plt = Plotter(
@@ -46,7 +42,7 @@ def plot_sa(problem, state, max_iters, name):
 
     plt.save()
 
-def plot_ga(problem, state, max_iters, name):
+def plot_ga(problem, max_iters, name):
     mutate_probs = [.1, .3, .5]
 
     plt = Plotter(
@@ -70,8 +66,8 @@ def plot_ga(problem, state, max_iters, name):
 
     plt.save()
 
-def plot_mimic(problem, state, max_iters, name):
-    keep_pcts = [.1, .3, .5, .7, .9]
+def plot_mimic(problem, max_iters, name):
+    keep_pcts = [.1, .3, .5, .7]
 
     plt = Plotter(
         name=name,
@@ -118,14 +114,12 @@ if __name__ == "__main__":
 
     plot_ga(
         problem=problem,
-        state=init_state,
         max_iters=100,
         name='10-Queens - GA'
     )
 
     plot_mimic(
         problem=problem,
-        state=init_state,
         max_iters=5,
         name='10-Queens - MIMIC'
     )
