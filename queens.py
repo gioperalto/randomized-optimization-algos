@@ -96,7 +96,7 @@ def plot_mimic(problem, state, max_iters, name):
 
 if __name__ == "__main__":
     init_state = np.arange(0, 10, 1, dtype=int)
-    problem, init_score = queens_problem(state=init_state, seed=93)
+    problem, init_score = queens_problem(state=init_state)
 
     rhc_state, rhc_score, rhc_fitness = randomized_hill_climb(
         problem=problem, 
