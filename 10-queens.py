@@ -6,7 +6,7 @@ from util.problems import queens_problem
 def plot_rhc(fitness_fn, name, label):
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/10-queens',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' }
     )
     plt.add_plot(
@@ -22,7 +22,7 @@ def plot_sa(problem, state, max_iters, name):
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/10-queens',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Start temp'
     )
@@ -47,7 +47,7 @@ def plot_ga(problem, max_iters, name):
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/10-queens',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Mutation prob'
     )
@@ -71,7 +71,7 @@ def plot_mimic(problem, max_iters, name):
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/10-queens',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Keep (%)'
     )
