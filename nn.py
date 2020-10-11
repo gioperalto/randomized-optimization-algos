@@ -8,6 +8,7 @@ from mlrose import NeuralNetwork, GeomDecay
 from tqdm import tqdm
 import warnings
 import numpy as np
+import time
 
 def warn(*args, **kwargs):
     pass
@@ -55,122 +56,200 @@ def create_ga_nn(x, y, max_iter, mutation_prob):
         hidden_nodes=[x.shape[1], x.shape[1]],
         algorithm='genetic_alg',
         max_iters=max_iter,
+        pop_size=x.shape[1],
         mutation_prob=mutation_prob,
         random_state=0,
         curve=True,
     ).fit(x, y)
 
-def plot(data, name, labels, legend_title=None, top_limit=None):
+def plot(x, name, label=None, legend_title=None, top_limit=None):
     plt = Plotter(
         name=name,
         learner='nn',
-        axes={ 'x': 'Iterations', 'y': 'Loss' },
+        axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title=legend_title
     )
-    for i in range(len(data)):
-        plt.add_plot(
-            x=np.arange(1, len(data[i])+1, dtype=int), 
-            y=data[i], 
-            label=labels[i],
-            marker=None
-        )
+    # Training data
+    plt.add_plot(
+        x=np.arange(1, len(x)+1, dtype=int), 
+        y=x, 
+        label=label,
+        marker=None
+    )
     plt.save(top_limit=top_limit)
 
 def sgd_learning_curve(episodes, x_train, y_train):
-    lrs = [0.0025]
-    sgd_losses = np.zeros((len(lrs), episodes))
+    lr = 0.0025
+    sgd_losses = np.zeros(episodes)
 
     # Train NNs w/ sgd
     for i in tqdm(range(episodes)):
-        for lr in range(len(lrs)):
-            sgd_losses[lr][i] = create_sgd_nn(
-                x=x_train,
-                y=y_train,
-                max_iter=i+1,
-                lr=lrs[lr]
-            ).loss
+        sgd_losses[i] = create_sgd_nn(
+            x=x_train,
+            y=y_train,
+            max_iter=i+1,
+            lr=lr
+        ).loss
 
     # Plot loss
     plot(
-        data=sgd_losses,
-        name='Learning Curve - SGD',
-        labels=[lr for lr in lrs],
-        legend_title='Learning rate',
-        # top_limit=2.
+        x=sgd_losses,
+        name='SGD - Loss vs Iterations',
+        label=lr,
+        legend_title='Learning rate'
     )
 
-    print('SGD - Min loss (train):', min(sgd_losses.flatten()))
+def sgd_fitness_curve(episodes, x_train, y_train, x_test):
+    lr = 0.0025
+    create_start = time.process_time()
+    fitness_curve = create_sgd_nn(
+        x=x_train,
+        y=y_train,
+        max_iter=episodes,
+        lr=lr
+    ).fitness_curve
+    create_time = time.process_time() - create_start
+    print('(SGD) time:', create_time)
+    max_fit = max(fitness_curve)
+    print('Best f(x) - SGD:', max_fit)
+    print('Iter:', list(fitness_curve).index(max_fit)+1)
 
+    plot(
+        x=fitness_curve, 
+        name='SGD - Fitness vs Iterations',
+        label=lr,
+        legend_title='Learning rate'
+    )
+    
 def rhc_learning_curve(episodes, x_train, y_train):
-    restarts = [0]
-    rhc_losses = np.zeros((len(restarts), episodes))
+    restarts = 0
+    rhc_losses = np.zeros(episodes)
 
     # Train NNs w/ sgd
     for i in tqdm(range(episodes)):
-        for r in range(len(restarts)):
-            rhc_losses[r][i] = create_rhc_nn(
-                x=x_train,
-                y=y_train,
-                max_iter=i+1,
-                restarts=restarts[r]
-            ).loss
+        rhc_losses[i] = create_rhc_nn(
+            x=x_train,
+            y=y_train,
+            max_iter=i+1,
+            restarts=restarts
+        ).loss
 
     # Plot loss
     plot(
-        data=rhc_losses,
-        name='Learning Curve - RHC',
-        labels=['Randomized Hill Climbing']
+        x=rhc_losses,
+        name='RHC - Loss vs Iterations',
+        label=restarts,
+        legend_title='Restarts'
     )
 
-    print('RHC - Min loss (train):', min(rhc_losses.flatten()))
+def rhc_fitness_curve(episodes, x_train, y_train, x_test):
+    restarts = 0
+    create_start = time.process_time()
+    fitness_curve = create_rhc_nn(
+        x=x_train,
+        y=y_train,
+        max_iter=episodes,
+        restarts=restarts
+    ).fitness_curve
+    create_time = time.process_time() - create_start
+    print('(RHC) time:', create_time)
+    max_fit = max(fitness_curve)
+    print('Best f(x) - RHC:', max_fit)
+    print('Iter:', list(fitness_curve).index(max_fit)+1)
+
+    plot(
+        x=fitness_curve, 
+        name='RHC - Fitness vs Iterations',
+        label=restarts,
+        legend_title='Restarts'
+    )
 
 def sa_learning_curve(episodes, x_train, y_train):
-    temps = [0.2]
-    sa_losses = np.zeros((len(temps), episodes))
+    temp = 0.2
+    sa_losses = np.zeros(episodes)
 
     # Train NNs w/ sgd
     for i in tqdm(range(episodes)):
-        for t in range(len(temps)):
-            sa_losses[t][i] = create_sa_nn(
-                x=x_train,
-                y=y_train,
-                max_iter=i+1,
-                temp=temps[t]
-            ).loss
+        sa_losses[i] = create_sa_nn(
+            x=x_train,
+            y=y_train,
+            max_iter=i+1,
+            temp=temp
+        ).loss
 
     # Plot loss
     plot(
-        data=sa_losses,
-        name='Learning Curve - SA',
-        labels=[t for t in temps],
+        x=sa_losses,
+        name='SA - Loss vs Iterations',
+        label=temp,
         legend_title='Temperature'
     )
 
-    print('SA - Min loss (train):', min(sa_losses.flatten()))
+def sa_fitness_curve(episodes, x_train, y_train, x_test):
+    temp = temp = 0.2
+    create_start = time.process_time()
+    fitness_curve = create_sa_nn(
+        x=x_train,
+        y=y_train,
+        max_iter=episodes,
+        temp=temp
+    ).fitness_curve
+    create_time = time.process_time() - create_start
+    print('(SA) time:', create_time)
+    max_fit = max(fitness_curve)
+    print('Best f(x) - SA:', max_fit)
+    print('Iter:', list(fitness_curve).index(max_fit)+1)
+
+    plot(
+        x=fitness_curve, 
+        name='SA - Fitness vs Iterations',
+        label=temp,
+        legend_title='Temp'
+    )
 
 def ga_learning_curve(episodes, x_train, y_train):
-    mutation_probs = [0.5]
-    ga_losses = np.zeros((len(mutation_probs), episodes))
+    mutation_prob = 0.5
+    ga_losses = np.zeros(episodes)
 
     # Train NNs w/ GA
     for i in tqdm(range(episodes)):
-        for t in range(len(mutation_probs)):
-            ga_losses[t][i] = create_ga_nn(
-                x=x_train,
-                y=y_train,
-                max_iter=i+1,
-                mutation_prob=mutation_probs[t]
-            ).loss
+        ga_losses[i] = create_ga_nn(
+            x=x_train,
+            y=y_train,
+            max_iter=i+1,
+            mutation_prob=mutation_prob
+        ).loss
 
     # Plot loss
     plot(
-        data=ga_losses,
-        name='Learning Curve - GA',
-        labels=[mp for mp in mutation_probs],
+        x=ga_losses,
+        name='GA - Loss vs Generations',
+        label=mutation_prob,
         legend_title='Mutation prob'
     )
 
-    print('GA - Min loss (train):', min(ga_losses.flatten()))
+def ga_fitness_curve(episodes, x_train, y_train, x_test):
+    mutation_prob = 0.5
+    create_start = time.process_time()
+    fitness_curve = create_ga_nn(
+        x=x_train,
+        y=y_train,
+        max_iter=episodes,
+        mutation_prob=mutation_prob
+    ).fitness_curve
+    create_time = time.process_time() - create_start
+    print('(GA) time:', create_time)
+    max_fit = max(fitness_curve)
+    print('Best f(x) - GA:', max_fit)
+    print('Iter:', list(fitness_curve).index(max_fit)+1)
+
+    plot(
+        x=fitness_curve, 
+        name='GA - Fitness vs Generations',
+        label=mutation_prob,
+        legend_title='Mutation prob'
+    )
+
 
 if __name__ == "__main__":
     np.random.seed(93)
@@ -187,7 +266,14 @@ if __name__ == "__main__":
 
     episodes = 500
    
-    # sgd_learning_curve(episodes, x_train, y_train)
-    # rhc_learning_curve(episodes, x_train, y_train)
-    # sa_learning_curve(episodes, x_train, y_train)
+    sgd_learning_curve(episodes, x_train, y_train)
+    sgd_fitness_curve(500, x_train, y_train, x_test)
+
+    rhc_learning_curve(episodes, x_train, y_train)
+    rhc_fitness_curve(5000, x_train, y_train, x_test)
+
+    sa_learning_curve(episodes, x_train, y_train)
+    sa_fitness_curve(3000, x_train, y_train, x_test)
+
     ga_learning_curve(episodes, x_train, y_train)
+    ga_fitness_curve(3000, x_train, y_train, x_test)
