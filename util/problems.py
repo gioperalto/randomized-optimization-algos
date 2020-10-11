@@ -1,7 +1,7 @@
 import six
 import sys
 sys.modules['sklearn.externals.six'] = six
-from mlrose import DiscreteOpt, TSPOpt, Queens, TravellingSales, Knapsack
+from mlrose import DiscreteOpt, TSPOpt, Queens, TravellingSales, Knapsack, FourPeaks
 import numpy as np
 
 def queens_problem(state):
@@ -36,4 +36,14 @@ def knapsack_problem(state):
         fitness_fn=fitness,
         maximize=True,
         max_val=length
+    ), fitness.evaluate(state)
+
+def four_peaks_problem(state):
+    fitness = FourPeaks(t_pct=0.15)
+
+    return DiscreteOpt(
+        length=state.shape[0],
+        fitness_fn=fitness,
+        maximize=True,
+        max_val=2
     ), fitness.evaluate(state)
