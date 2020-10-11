@@ -1,17 +1,17 @@
 import numpy as np
 from util.plotter import Plotter
 from util.algos import randomized_hill_climb, simulated_annealing, genetic_algorithm, mimic
-from util.problems import queens_problem
+from util.problems import knapsack_problem
 
 def plot_rhc(fitness_fn, name, label):
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/knapsack',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' }
     )
     plt.add_plot(
-        x=np.arange(1, len(fitness_fn)+1, dtype=int), 
-        y=fitness_fn, 
+        x=np.arange(1, len(rhc_fitness)+1, dtype=int), 
+        y=rhc_fitness, 
         label=label, 
         marker=None
     )
@@ -22,7 +22,7 @@ def plot_sa(problem, state, max_iters, name):
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/knapsack',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Start temp'
     )
@@ -43,11 +43,11 @@ def plot_sa(problem, state, max_iters, name):
     plt.save()
 
 def plot_ga(problem, max_iters, name):
-    mutate_probs = [.1, .3, .5]
+    mutate_probs = [.3, .4, .5, .6]
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/knapsack',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Mutation prob'
     )
@@ -67,11 +67,11 @@ def plot_ga(problem, max_iters, name):
     plt.save()
 
 def plot_mimic(problem, max_iters, name):
-    keep_pcts = [.1, .3, .5, .7]
+    keep_pcts = [.1, .2, .3, .4]
 
     plt = Plotter(
         name=name,
-        learner='optimization-problems/queens',
+        learner='optimization-problems/knapsack',
         axes={ 'x': 'Iterations', 'y': 'Fitness(x)' },
         legend_title='Keep (%)'
     )
@@ -91,8 +91,8 @@ def plot_mimic(problem, max_iters, name):
     plt.save()
 
 if __name__ == "__main__":
-    init_state = np.arange(0, 10, 1, dtype=int)
-    problem, init_score = queens_problem(state=init_state)
+    init_state = np.array([1, 0, 2, 1, 0])
+    problem, init_score = knapsack_problem(state=init_state)
 
     rhc_state, rhc_score, rhc_fitness = randomized_hill_climb(
         problem=problem, 
@@ -101,25 +101,33 @@ if __name__ == "__main__":
     )
     plot_rhc(
         fitness_fn=rhc_fitness, 
-        name='10-Queens - RHC',
+        name='Knapsack - RHC',
         label='Random Hill Climb'
     )
+
+    print('RHC generated')
 
     plot_sa(
         problem=problem,
         state=init_state,
         max_iters=100,
-        name='10-Queens - SA'
+        name='Knapsack - SA'
     )
+
+    print('SA generated')
 
     plot_ga(
         problem=problem,
-        max_iters=100,
-        name='10-Queens - GA'
+        max_iters=10,
+        name='Knapsack - GA'
     )
+
+    print('GA generated')
 
     plot_mimic(
         problem=problem,
         max_iters=10,
-        name='10-Queens - MIMIC'
+        name='Knapsack - MIMIC'
     )
+
+    print('MIMIC generated')

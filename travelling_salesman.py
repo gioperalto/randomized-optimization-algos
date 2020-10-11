@@ -57,7 +57,6 @@ def plot_ga(problem, max_iters, name):
             max_iters=max_iters,
             mutation_prob=mp
         )
-        print('GA (max):', max(ga_fitness))
         plt.add_plot(
             x=np.arange(1, len(ga_fitness)+1, dtype=int),
             y=ga_fitness, 
@@ -82,7 +81,6 @@ def plot_mimic(problem, max_iters, name):
             max_iters=max_iters,
             keep_pct=kp
         )
-        print('MIMIC (max):', max(m_fitness))
         plt.add_plot(
             x=np.arange(1, len(m_fitness)+1, dtype=int),
             y=m_fitness, 
@@ -122,7 +120,7 @@ if __name__ == "__main__":
 
     plot_ga(
         problem=problem,
-        max_iters=20,
+        max_iters=10,
         name='Travelling Salesman - GA'
     )
 
@@ -130,7 +128,7 @@ if __name__ == "__main__":
 
     plot_mimic(
         problem=problem,
-        max_iters=20,
+        max_iters=10,
         name='Travelling Salesman - MIMIC'
     )
 
