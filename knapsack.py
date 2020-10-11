@@ -43,7 +43,7 @@ def plot_sa(problem, state, max_iters, name):
     plt.save()
 
 def plot_ga(problem, max_iters, name):
-    mutate_probs = [.3, .4, .5, .6]
+    mutate_probs = [.1, .3, .5]
 
     plt = Plotter(
         name=name,
@@ -67,7 +67,7 @@ def plot_ga(problem, max_iters, name):
     plt.save()
 
 def plot_mimic(problem, max_iters, name):
-    keep_pcts = [.1, .2, .3, .4]
+    keep_pcts = [.1, .3, .5, .7]
 
     plt = Plotter(
         name=name,
